@@ -72,8 +72,8 @@ data:
 
 ## 🧪 Requirements
 
-- Home Assistant 2023.6 or newer
-- Python 3.10+
+- Home Assistant 2025.1 or newer
+- Python 3.13+
 - asyncua==1.0.2 (automatically installed)
 
 ## 🏷 Supported Platforms

@@ -1,5 +1,3 @@
-# TODO CORRECTLY SETUP THE INTEGRATION PROJECT AS https://github.com/volkerrichert/ha_R_volution_player -> create venv, setup pycharm and requirements
-
 """The asyncua integration."""
 from __future__ import annotations
 
