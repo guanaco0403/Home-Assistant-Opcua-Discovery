@@ -65,9 +65,9 @@ You can manually set the value of a writable OPC UA node.
 ```yaml
 service: opcua_discovery.set_value
 data:
-node_hub: "My OPC UA Server"
-node_id: "ns=2;s=Pump1/Enable"
-value: true
+   node_hub: "My OPC UA Server"
+   node_id: "ns=2;s=Pump1/Enable"
+   value: true
 ```
 
 ## 🧪 Requirements
