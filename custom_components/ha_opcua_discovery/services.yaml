@@ -1,0 +1,21 @@
+opcua_set_value:
+  description: Set a value to an OPC UA node.
+  fields:
+    hub:
+      required: true
+      description: A specified hub that is configured inside the integration.
+      example: "example_hub"
+      selector:
+        text:
+    node_id:
+      description: The Node ID of the OPC UA node to write to.
+      required: true
+      example: "ns=2;s=SomeNodeId"
+      selector:
+        text:
+    value:
+      description: The value to write to the OPC UA node. Can be int, float, bool, string, byte
+      required: true
+      example: "0"
+      selector:
+        text:
