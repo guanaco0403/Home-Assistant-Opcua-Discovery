@@ -1,0 +1,1 @@
+"""Platform for sensor integration."""

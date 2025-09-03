@@ -1,0 +1,14 @@
+{
+  "domain": "ha_opcua_discovery",
+  "name": "Home Assistant OPC-UA Discovery",
+  "codeowners": ["@guanaco0403"],
+  "config_flow": true,
+  "documentation": "",
+  "integration_type": "hub",
+  "iot_class": "local_polling",
+  "issue_tracker": "",
+  "requirements": ["asyncua==1.0.2"],
+  "version": "v1.0.0",
+  "platforms": ["sensor", "switch"],
+  "quality_scale": "bronze"
+}

@@ -1,0 +1,2 @@
+asyncua==1.0.2
+homeassistant>=2025.1.0
