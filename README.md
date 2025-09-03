@@ -22,6 +22,11 @@ This integration supports **local polling** using the `asyncua` library and is i
 
 ---
 
+## Warning
+- This integration is only compatible with nodes of those types (int, float, string, bool), others will get ignored and won't appear in home assistant entities!
+
+---
+
 ## 📦 Installation
 
 ### Option 1: HACS (Recommended for Users) WARNING THIS INSTALLATION METHOD IS NOT WORKING YET

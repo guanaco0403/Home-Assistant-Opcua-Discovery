@@ -29,7 +29,16 @@ class AsyncuaSensor(CoordinatorEntity[AsyncuaCoordinator], SensorEntity):
         self._attr_name = name
         self._attr_unique_id = f"opcua_{coordinator.name}_{name}"
         self._node_id = node_id
-        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_state_class = None
+
+    @property
+    def state_class(self):
+        """Return the state class based on the type of native_value."""
+        value = self.native_value
+        if isinstance(value, (int, float, bool)):
+            return SensorStateClass.MEASUREMENT
+        # You can add more conditions if needed for other state classes
+        return None
 
     @property
     def native_value(self):
