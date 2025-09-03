@@ -29,7 +29,7 @@ This integration supports **local polling** using the `asyncua` library and is i
 
 ## 📦 Installation
 
-### Option 1: HACS (Recommended for Users) WARNING THIS INSTALLATION METHOD IS NOT WORKING YET
+### Option 1: HACS (Recommended for Users)
 
 1. Go to **HACS > Integrations > Custom repositories**
 2. Add this repo URL: https://github.com/yourusername/Home-Assistant-Opcua-Discovery
