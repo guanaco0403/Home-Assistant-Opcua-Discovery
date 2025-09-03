@@ -27,7 +27,7 @@ jobs:
         run: pip install ruff==0.8.4
 
       - name: Make script executable
-        run: chmod +x ./scripts/start_ruffs.sh
+        run: chmod +x ./scripts/start_ruffs_check.sh
 
       - name: Run Ruff linter
         run: ./scripts/start_ruffs_check.sh
