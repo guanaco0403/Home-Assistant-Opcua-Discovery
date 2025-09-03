@@ -1,4 +1,5 @@
 """Sensor platform for OPC UA."""
+
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -8,7 +9,10 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import AsyncuaCoordinator
 from .const import DOMAIN
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
+
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
     coordinator: AsyncuaCoordinator = hass.data[DOMAIN][entry.data["hub_id"]]
     sensors = []
 
@@ -21,6 +25,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
     async_add_entities(sensors)
 
+
 class AsyncuaSensor(CoordinatorEntity[AsyncuaCoordinator], SensorEntity):
     """Representation of an OPC UA sensor."""
 
@@ -29,7 +34,16 @@ class AsyncuaSensor(CoordinatorEntity[AsyncuaCoordinator], SensorEntity):
         self._attr_name = name
         self._attr_unique_id = f"opcua_{coordinator.name}_{name}"
         self._node_id = node_id
-        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_state_class = None
+
+    @property
+    def state_class(self):
+        """Return the state class based on the type of native_value."""
+        value = self.native_value
+        if isinstance(value, (int, float, bool)):
+            return SensorStateClass.MEASUREMENT
+        # You can add more conditions if needed for other state classes
+        return None
 
     @property
     def native_value(self):

@@ -13,7 +13,10 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
+
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
     coordinator: AsyncuaCoordinator = hass.data[DOMAIN][entry.data["hub_id"]]
     switches = []
 
@@ -25,6 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         switches.append(AsyncuaSwitch(coordinator, name, node_id))
 
     async_add_entities(switches)
+
 
 class AsyncuaSwitch(CoordinatorEntity[AsyncuaCoordinator], SwitchEntity):
     """Representation of an OPC UA writable boolean switch."""
