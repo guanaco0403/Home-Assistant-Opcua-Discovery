@@ -4,4 +4,4 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-run: black ./custom_components/
+black ./custom_components/
