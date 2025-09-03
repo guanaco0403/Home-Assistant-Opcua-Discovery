@@ -4,4 +4,4 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-ruff check . --fix
+ruff check ./custom_components/ --fix

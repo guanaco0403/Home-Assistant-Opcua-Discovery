@@ -1,4 +1,4 @@
-name: Checks Lint with Ruff
+name: Run multiple checks
 
 on:
   push:
@@ -28,11 +28,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Make script executable
-        run: chmod +x ./scripts/start_ruffs_check.sh
+      - name: Run Ruff linter checks
+        run: ruff check ./custom_components/
 
-      - name: Run Ruff linter
-        run: ./scripts/start_ruffs_check.sh
-
-      - name: Run Codespell Checks
+      - name: Run Codespell checks
         run: codespell custom_components/ -I .codespellignore
+
+      - name: Run Python code style with Black checks
+        run: black --check ./custom_components/
