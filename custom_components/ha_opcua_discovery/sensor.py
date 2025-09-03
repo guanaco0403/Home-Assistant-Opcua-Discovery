@@ -1,4 +1,5 @@
 """Sensor platform for OPC UA."""
+
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -8,7 +9,10 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import AsyncuaCoordinator
 from .const import DOMAIN
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
+
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
     coordinator: AsyncuaCoordinator = hass.data[DOMAIN][entry.data["hub_id"]]
     sensors = []
 
@@ -20,6 +24,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         sensors.append(AsyncuaSensor(coordinator, name, node_id))
 
     async_add_entities(sensors)
+
 
 class AsyncuaSensor(CoordinatorEntity[AsyncuaCoordinator], SensorEntity):
     """Representation of an OPC UA sensor."""

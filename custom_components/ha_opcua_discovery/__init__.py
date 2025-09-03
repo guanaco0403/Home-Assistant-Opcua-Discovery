@@ -1,4 +1,5 @@
 """The asyncua integration."""
+
 from __future__ import annotations
 
 import asyncio
@@ -60,7 +61,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hub = OpcuaHub(
         hub_name=hub_id,
         hub_url=entry.data[CONF_HUB_URL],
-        root_node_id=entry.options.get(CONF_HUB_ROOT_NODE, entry.data.get(CONF_HUB_ROOT_NODE)),
+        root_node_id=entry.options.get(
+            CONF_HUB_ROOT_NODE, entry.data.get(CONF_HUB_ROOT_NODE)
+        ),
         username=entry.data.get(CONF_HUB_USERNAME),
         password=entry.data.get(CONF_HUB_PASSWORD),
     )
@@ -70,7 +73,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=hub_id,
         hub=hub,
         update_interval_in_second=timedelta(
-            seconds=entry.options.get(CONF_HUB_SCAN_INTERVAL, entry.data.get(CONF_HUB_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL))
+            seconds=entry.options.get(
+                CONF_HUB_SCAN_INTERVAL,
+                entry.data.get(CONF_HUB_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+            )
         ),
     )
 
@@ -116,13 +122,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload config entry and disconnect OPC UA client."""
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, ["sensor", "switch"])
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        entry, ["sensor", "switch"]
+    )
     if unload_ok:
         hub_id = entry.data[CONF_HUB_ID]
         coordinator = hass.data[DOMAIN].pop(hub_id, None)
         if coordinator:
             await coordinator.hub.disconnect()
     return unload_ok
+
 
 class OpcuaHub:
     """OPC UA Hub client."""
@@ -249,7 +258,9 @@ class OpcuaHub:
             return True
 
         except Exception as e:
-            _LOGGER.warning(f"Failed to check if node {node_id} is writable boolean: {e}")
+            _LOGGER.warning(
+                f"Failed to check if node {node_id} is writable boolean: {e}"
+            )
             return False
 
     @asyncua_wrapper
@@ -267,17 +278,23 @@ class OpcuaHub:
 
                     # Only keep scalar values compatible with Home Assistant
                     if isinstance(value, (int, float, str, bool)):
-                        discovered_nodes.append({
-                            "name": browse_name.Name,
-                            "node_id": node_id,
-                            "value": value,
-                        })
+                        discovered_nodes.append(
+                            {
+                                "name": browse_name.Name,
+                                "node_id": node_id,
+                                "value": value,
+                            }
+                        )
                     else:
                         _LOGGER.warning(
                             f"Skipping node {node_id} ({browse_name.Name}) with unsupported value type: {type(value).__name__}"
                         )
 
-                elif node_class in (NodeClass.Object, NodeClass.ObjectType, NodeClass.VariableType):
+                elif node_class in (
+                    NodeClass.Object,
+                    NodeClass.ObjectType,
+                    NodeClass.VariableType,
+                ):
                     # Recurse into child nodes
                     children = await node.get_children()
                     for child in children:
@@ -291,7 +308,9 @@ class OpcuaHub:
             await _recurse_node(root_node)
 
         except Exception as e:
-            _LOGGER.warning(f"Failed to start node discovery from root node {self.root_node_id}: {e}")
+            _LOGGER.warning(
+                f"Failed to start node discovery from root node {self.root_node_id}: {e}"
+            )
 
         return discovered_nodes
 
@@ -331,8 +350,7 @@ class OpcuaHub:
 
         # Convert value safely to UA variant
         variant = ua_utils.string_to_variant(
-            value if isinstance(value, str) else str(value),
-            variant_type
+            value if isinstance(value, str) else str(value), variant_type
         )
 
         await node.write_value(ua.DataValue(variant))
@@ -342,10 +360,14 @@ class OpcuaHub:
 class AsyncuaCoordinator(DataUpdateCoordinator):
     """Coordinator for managing OPC UA polling."""
 
-    def __init__(self, hass, name, hub: OpcuaHub, update_interval_in_second=DEFAULT_SCAN_INTERVAL):
+    def __init__(
+        self, hass, name, hub: OpcuaHub, update_interval_in_second=DEFAULT_SCAN_INTERVAL
+    ):
         self._hub = hub
         self._node_key_pair = {}
-        super().__init__(hass, _LOGGER, name=name, update_interval=update_interval_in_second)
+        super().__init__(
+            hass, _LOGGER, name=name, update_interval=update_interval_in_second
+        )
 
     @property
     def hub(self) -> OpcuaHub:
