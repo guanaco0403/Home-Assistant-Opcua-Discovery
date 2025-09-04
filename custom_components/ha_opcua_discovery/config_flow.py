@@ -61,7 +61,7 @@ class AsyncUAConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Optional(CONF_USERNAME): str,
                 vol.Optional(CONF_PASSWORD): str,
                 vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): int,
-                vol.Optional(CONF_HUB_ROOT_NODE, default="ns=2;i=1"): str,
+                vol.Required(CONF_HUB_ROOT_NODE, default="ns=2;i=1"): str,
             }
         )
 
@@ -82,15 +82,19 @@ class AsyncUAOptionsFlow(config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
         """Manage the options."""
         if user_input is not None:
+            url = user_input[CONF_URL]
+            username = user_input.get(CONF_USERNAME)
+            password = user_input.get(CONF_PASSWORD)
             root_node = user_input.get(CONF_HUB_ROOT_NODE, "").strip()
-            scan_interval = user_input.get(
-                CONF_HUB_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
-            )
+            scan_interval = user_input.get(CONF_HUB_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
 
             # Update the options by creating the entry
             result = self.async_create_entry(
                 title="",
                 data={
+                    CONF_HUB_URL: url,
+                    CONF_HUB_USERNAME: username,
+                    CONF_HUB_PASSWORD: password,
                     CONF_HUB_SCAN_INTERVAL: scan_interval,
                     CONF_HUB_ROOT_NODE: root_node,
                 },
@@ -102,6 +106,25 @@ class AsyncUAOptionsFlow(config_entries.OptionsFlow):
             )
 
             return result
+
+        current_hub_url = self.config_entry.options.get(
+            CONF_HUB_URL,
+            self.config_entry.data.get(CONF_HUB_URL),
+        )
+
+        current_hub_username = self.config_entry.options.get(
+            CONF_HUB_USERNAME,
+            self.config_entry.data.get(CONF_HUB_USERNAME),
+        )
+        if current_hub_username is None: # We dont want to have a None value else it will generate an error
+            current_hub_username = ""
+
+        current_hub_password = self.config_entry.options.get(
+            CONF_HUB_PASSWORD,
+            self.config_entry.data.get(CONF_HUB_PASSWORD),
+        )
+        if current_hub_password is None:
+            current_hub_password = ""
 
         current_scan_interval = self.config_entry.options.get(
             CONF_HUB_SCAN_INTERVAL,
@@ -117,10 +140,11 @@ class AsyncUAOptionsFlow(config_entries.OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Optional(
-                        CONF_HUB_SCAN_INTERVAL, default=current_scan_interval
-                    ): int,
-                    vol.Optional(CONF_HUB_ROOT_NODE, default=current_root_node): str,
+                    vol.Required(CONF_HUB_URL, default=current_hub_url): str,
+                    vol.Optional(CONF_HUB_USERNAME, default=current_hub_username): str,
+                    vol.Optional(CONF_HUB_PASSWORD, default=current_hub_password): str,
+                    vol.Optional(CONF_HUB_SCAN_INTERVAL, default=current_scan_interval): int,
+                    vol.Required(CONF_HUB_ROOT_NODE, default=current_root_node): str,
                 }
             ),
         )
