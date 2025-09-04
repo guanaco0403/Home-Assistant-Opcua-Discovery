@@ -271,42 +271,63 @@ class OpcuaHub:
         async def _recurse_node(node):
             try:
                 node_class = await node.read_node_class()
+                browse_name = await node.read_browse_name()
+                node_id = node.nodeid.to_string()
+
                 if node_class == NodeClass.Variable:
-                    node_id = node.nodeid.to_string()
-                    browse_name = await node.read_browse_name()
-                    value = await node.read_value()
-
-                    # Only keep scalar values compatible with Home Assistant
-                    if isinstance(value, (int, float, str, bool)):
-                        discovered_nodes.append(
-                            {
-                                "name": browse_name.Name,
-                                "node_id": node_id,
-                                "value": value,
-                            }
-                        )
-                    else:
+                    try:
+                        value = await node.read_value()
+                        if isinstance(value, (int, float, str, bool)):
+                            discovered_nodes.append(
+                                {
+                                    "name": browse_name.Name,
+                                    "node_id": node_id,
+                                    "value": value,
+                                }
+                            )
+                        else:
+                            _LOGGER.warning(
+                                f"Skipping node {node_id} ({browse_name.Name}) with unsupported value type: {type(value).__name__}"
+                            )
+                    except ua.UaStatusCodeError as err:
+                        if err.code == ua.StatusCodes.BadNotReadable:
+                            _LOGGER.warning(
+                                f"Skipping unreadable node {node_id} ({browse_name.Name}): BadNotReadable"
+                            )
+                        else:
+                            _LOGGER.warning(
+                                f"UaStatusCodeError while reading node {node_id} ({browse_name.Name}): {err}"
+                            )
+                    except Exception as err:
                         _LOGGER.warning(
-                            f"Skipping node {node_id} ({browse_name.Name}) with unsupported value type: {type(value).__name__}"
+                            f"Error reading value from node {node_id} ({browse_name.Name}): {err}"
                         )
 
-                elif node_class in (
-                    NodeClass.Object,
-                    NodeClass.ObjectType,
-                    NodeClass.VariableType,
+                # Always try to recurse into child nodes
+                if (
+                    node_class
+                    in (
+                        NodeClass.Object,
+                        NodeClass.ObjectType,
+                        NodeClass.VariableType,
+                    )
+                    or node_class == NodeClass.Variable
                 ):
-                    # Recurse into child nodes
-                    children = await node.get_children()
-                    for child in children:
-                        await _recurse_node(child)
+                    try:
+                        children = await node.get_children()
+                        for child in children:
+                            await _recurse_node(child)
+                    except Exception as err:
+                        _LOGGER.warning(
+                            f"Failed to get children for node {node_id} ({browse_name.Name}): {err}"
+                        )
 
-            except Exception as e:
-                _LOGGER.warning(f"Error while processing node {node}: {e}")
+            except Exception as err:
+                _LOGGER.warning(f"Error while processing node {node}: {err}")
 
         try:
             root_node = self.client.get_node(self.root_node_id)
             await _recurse_node(root_node)
-
         except Exception as e:
             _LOGGER.warning(
                 f"Failed to start node discovery from root node {self.root_node_id}: {e}"
