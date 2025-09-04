@@ -17,9 +17,10 @@ async def async_setup_entry(
     sensors = []
 
     for name, node_id in coordinator.node_key_pair.items():
-        # Skip nodes that are writable booleans (handled by switches)
+        # Skip nodes that are writable booleans (handled by switches) or numbers
         is_writable_boolean = await coordinator.hub.is_writable_boolean(node_id)
-        if is_writable_boolean:
+        is_writable_number = await coordinator.hub.is_writable_number(node_id)
+        if is_writable_boolean or is_writable_number:
             continue
         sensors.append(AsyncuaSensor(coordinator, name, node_id))
 

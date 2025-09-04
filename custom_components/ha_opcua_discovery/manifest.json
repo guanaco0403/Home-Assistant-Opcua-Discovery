@@ -9,6 +9,6 @@
   "issue_tracker": "",
   "requirements": ["asyncua==1.0.2"],
   "version": "v1.0.1",
-  "platforms": ["sensor", "switch"],
+  "platforms": ["sensor", "switch", "number"],
   "quality_scale": "bronze"
 }

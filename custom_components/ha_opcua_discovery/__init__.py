@@ -90,7 +90,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator.set_nodes(nodes)
 
     await coordinator.async_config_entry_first_refresh()
-    await hass.config_entries.async_forward_entry_setups(entry, ["sensor", "switch"])
+    await hass.config_entries.async_forward_entry_setups(entry, ["sensor", "switch", "number"])
 
     async def _handle_set_value(service):
         try:
@@ -123,7 +123,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload config entry and disconnect OPC UA client."""
     unload_ok = await hass.config_entries.async_unload_platforms(
-        entry, ["sensor", "switch"]
+        entry, ["sensor", "switch", "number"]
     )
     if unload_ok:
         hub_id = entry.data[CONF_HUB_ID]
@@ -245,6 +245,37 @@ class OpcuaHub:
             data_type_browse_name = await data_type_node_obj.read_browse_name()
 
             if data_type_browse_name.Name != "Boolean":
+                return False
+
+            # Read AccessLevel attribute
+            access_level_dv = await node.read_attribute(ua.AttributeIds.AccessLevel)
+            access_level = access_level_dv.Value.Value
+
+            # Check if writable bit is set (bit 1 is writable)
+            if (access_level & 0x02) == 0:
+                return False
+
+            return True
+
+        except Exception as e:
+            _LOGGER.warning(
+                f"Failed to check if node {node_id} is writable boolean: {e}"
+            )
+            return False
+
+    @asyncua_wrapper
+    async def is_writable_number(self, node_id: str) -> bool:
+        try:
+            node = self.client.get_node(node_id)
+            node_class = await node.read_node_class()
+            if node_class != NodeClass.Variable:
+                return False
+
+            data_type_node = await node.read_data_type()
+            data_type_node_obj = self.client.get_node(data_type_node)
+            data_type_browse_name = await data_type_node_obj.read_browse_name()
+
+            if data_type_browse_name.Name not in ["Int16", "Int32", "Int64", "UInt16", "UInt32", "UInt64","Byte", "SByte"]:
                 return False
 
             # Read AccessLevel attribute
