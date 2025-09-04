@@ -13,7 +13,7 @@ from asyncua.common import ua_utils
 from asyncua.ua import NodeClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import HomeAssistantError, ConfigEntryNotReady
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_component import DEFAULT_SCAN_INTERVAL
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -60,12 +60,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hub = OpcuaHub(
         hub_name=hub_id,
-        hub_url=entry.data[CONF_HUB_URL],
-        root_node_id=entry.options.get(
-            CONF_HUB_ROOT_NODE, entry.data.get(CONF_HUB_ROOT_NODE)
-        ),
-        username=entry.data.get(CONF_HUB_USERNAME),
-        password=entry.data.get(CONF_HUB_PASSWORD),
+        hub_url=entry.options.get(CONF_HUB_URL, entry.data.get(CONF_HUB_URL)),
+        root_node_id=entry.options.get(CONF_HUB_ROOT_NODE, entry.data.get(CONF_HUB_ROOT_NODE)),
+        username=entry.options.get(CONF_HUB_USERNAME, entry.data.get(CONF_HUB_USERNAME)),
+        password=entry.options.get(CONF_HUB_PASSWORD, entry.data.get(CONF_HUB_PASSWORD)),
     )
 
     coordinator = AsyncuaCoordinator(
@@ -83,7 +81,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][hub_id] = coordinator
 
     # Connect to the OPC-UA Server
-    await hub.connect()
+    connected = await hub.connect()
+    if not connected:
+        raise ConfigEntryNotReady("Failed to connect to OPC UA server")
 
     # Fetch nodes from root node ID
     nodes = await hub.discover_nodes()
