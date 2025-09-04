@@ -304,11 +304,15 @@ class OpcuaHub:
                         )
 
                 # Always try to recurse into child nodes
-                if node_class in (
+                if (
+                    node_class
+                    in (
                         NodeClass.Object,
                         NodeClass.ObjectType,
                         NodeClass.VariableType,
-                ) or node_class == NodeClass.Variable:
+                    )
+                    or node_class == NodeClass.Variable
+                ):
                     try:
                         children = await node.get_children()
                         for child in children:
