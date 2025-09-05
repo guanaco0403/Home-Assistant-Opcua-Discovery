@@ -61,9 +61,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hub = OpcuaHub(
         hub_name=hub_id,
         hub_url=entry.options.get(CONF_HUB_URL, entry.data.get(CONF_HUB_URL)),
-        root_node_id=entry.options.get(CONF_HUB_ROOT_NODE, entry.data.get(CONF_HUB_ROOT_NODE)),
-        username=entry.options.get(CONF_HUB_USERNAME, entry.data.get(CONF_HUB_USERNAME)),
-        password=entry.options.get(CONF_HUB_PASSWORD, entry.data.get(CONF_HUB_PASSWORD)),
+        root_node_id=entry.options.get(
+            CONF_HUB_ROOT_NODE, entry.data.get(CONF_HUB_ROOT_NODE)
+        ),
+        username=entry.options.get(
+            CONF_HUB_USERNAME, entry.data.get(CONF_HUB_USERNAME)
+        ),
+        password=entry.options.get(
+            CONF_HUB_PASSWORD, entry.data.get(CONF_HUB_PASSWORD)
+        ),
     )
 
     coordinator = AsyncuaCoordinator(

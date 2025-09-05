@@ -86,7 +86,9 @@ class AsyncUAOptionsFlow(config_entries.OptionsFlow):
             username = user_input.get(CONF_USERNAME)
             password = user_input.get(CONF_PASSWORD)
             root_node = user_input.get(CONF_HUB_ROOT_NODE, "").strip()
-            scan_interval = user_input.get(CONF_HUB_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+            scan_interval = user_input.get(
+                CONF_HUB_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
+            )
 
             # Update the options by creating the entry
             result = self.async_create_entry(
@@ -116,7 +118,9 @@ class AsyncUAOptionsFlow(config_entries.OptionsFlow):
             CONF_HUB_USERNAME,
             self.config_entry.data.get(CONF_HUB_USERNAME),
         )
-        if current_hub_username is None: # We dont want to have a None value else it will generate an error
+        if (
+            current_hub_username is None
+        ):  # We dont want to have a None value else it will generate an error
             current_hub_username = ""
 
         current_hub_password = self.config_entry.options.get(
@@ -143,7 +147,9 @@ class AsyncUAOptionsFlow(config_entries.OptionsFlow):
                     vol.Required(CONF_HUB_URL, default=current_hub_url): str,
                     vol.Optional(CONF_HUB_USERNAME, default=current_hub_username): str,
                     vol.Optional(CONF_HUB_PASSWORD, default=current_hub_password): str,
-                    vol.Optional(CONF_HUB_SCAN_INTERVAL, default=current_scan_interval): int,
+                    vol.Optional(
+                        CONF_HUB_SCAN_INTERVAL, default=current_scan_interval
+                    ): int,
                     vol.Required(CONF_HUB_ROOT_NODE, default=current_root_node): str,
                 }
             ),
