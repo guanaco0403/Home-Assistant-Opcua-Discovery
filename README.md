@@ -14,17 +14,21 @@ This integration supports **local polling** using the `asyncua` library and is i
 ## ✨ Features
 
 - 📡 Connects to any OPC UA compatible server (e.g., Siemens, B&R, etc.)
-- 🔍 Auto-discovers variables under a defined root node
+- 🔍 Auto-discovers variables (nodes) under a defined root node
 - 🧠 Smart handling of data types (e.g., booleans become switches)
 - 🔄 Periodic polling with configurable scan interval
 - 🧪 Graceful reconnection logic on connection loss
-- 📥 Set values via Home Assistant services (`opcua.set_value`)
+- 📥 Set opc-ua nodes values via Home Assistant services (`opcua.set_value`)
+- 🤝 Supports multiple simultaneous OPC-UA clients
 
 ---
 
 ## Warning
-- This integration is only compatible with nodes of those types (int, float, string, bool), others will get ignored and won't appear in home assistant entities!
-
+- This integration is only compatible with nodes of those types (int, float, string, bool, byte), others will get ignored and won't appear in home assistant entities!
+- The entity unique id is generated using the hub name and the opc-ua node name under that format (opcua_<hub_name>_<node_name>), if you change the node name on the opc-ua server, a new entity will be created in home assistant. **THIS ALSO MEANS THAT EVERY NODES NAMES MUST BE UNIQUE !!!**
+- When a node gets removed from the opc-ua server, its associated entity will display "this entity is no longer being provided by the integration" once the hub/integration is reloaded, this is normal, you need to manually delete it from home assistant.
+- When a node gets added on the opc-ua server, the entity will automatically get added to home assistant once the hub/integration is reloaded.
+- More you have exposed opc-ua nodes, more it will take time to load the integration
 ---
 
 ## 📦 Installation
@@ -33,7 +37,7 @@ This integration supports **local polling** using the `asyncua` library and is i
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?repository=Home-Assistant-Opcua-Discovery&owner=guanaco0403&category=integration)
 
 1. Go to **HACS > Integrations > Custom repositories**
-2. Add this repo URL: https://github.com/yourusername/Home-Assistant-Opcua-Discovery
+2. Add this repo URL: https://github.com/guanaco0403/Home-Assistant-Opcua-Discovery
 3. Select category: **Integration**
 4. Click **Add**
 5. Install the `Home Assistant OPC-UA Discovery` integration
@@ -41,7 +45,7 @@ This integration supports **local polling** using the `asyncua` library and is i
 
 ### Option 2: Manual
 
-1. Download the repository as a ZIP
+1. Download the latest release `ha_opcua_discovery.zip`
 2. Extract and copy the `ha_opcua_discovery` folder into: /config/custom_components/
 3. Restart Home Assistant
 
@@ -58,7 +62,7 @@ This integration supports **local polling** using the `asyncua` library and is i
 - **Username** (optional)
 - **Password** (optional)
 - **Root Node ID** (e.g., `ns=2;i=85`)
-- **Scan Interval** in seconds (optional)
+- **Scan Interval** in seconds
 
 ---
 
