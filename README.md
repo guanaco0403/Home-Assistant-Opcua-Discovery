@@ -30,6 +30,7 @@ This integration supports **local polling** using the `asyncua` library and is i
 ## 📦 Installation
 
 ### Option 1: HACS (Recommended for Users)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?repository=Home-Assistant-Opcua-Discovery&owner=guanaco0403&category=integration)
 
 1. Go to **HACS > Integrations > Custom repositories**
 2. Add this repo URL: https://github.com/yourusername/Home-Assistant-Opcua-Discovery
